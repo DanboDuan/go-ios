@@ -3,6 +3,7 @@ package installationproxy
 import (
 	"bytes"
 	"fmt"
+
 	log "github.com/sirupsen/logrus"
 
 	ios "github.com/danielpaulus/go-ios/ios"
@@ -127,6 +128,7 @@ func plistFromBytes(plistBytes []byte) (BrowseResponse, error) {
 	}
 	return browseResponse, nil
 }
+
 func browseApps(applicationType string, showLaunchProhibitedApps bool) map[string]interface{} {
 	returnAttributes := []string{
 		"ApplicationDSID",
@@ -155,7 +157,7 @@ func browseApps(applicationType string, showLaunchProhibitedApps bool) map[strin
 		clientOptions["ApplicationType"] = applicationType
 	}
 	if showLaunchProhibitedApps {
-                clientOptions["ShowLaunchProhibitedApps"] = true
+		clientOptions["ShowLaunchProhibitedApps"] = true
 	}
 	return map[string]interface{}{"ClientOptions": clientOptions, "Command": "Browse"}
 }

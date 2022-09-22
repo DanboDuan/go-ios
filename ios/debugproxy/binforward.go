@@ -25,6 +25,8 @@ var serviceConfigurations = map[string]serviceConfig{
 	"com.apple.instruments.remoteserver.DVTSecureSocketProxy": {NewDtxDecoder, false},
 	"com.apple.testmanagerd.lockdown.secure":                  {NewDtxDecoder, false},
 	"bindumper":                                               {NewBinDumpOnly, false},
+	"com.apple.mobile.installation_proxy":                     {NewBinaryPlist, false},
+	"com.apple.streaming_zip_conduit":                         {NewStreamingZipConduit, false},
 }
 
 func getServiceConfigForName(serviceName string) serviceConfig {
@@ -41,6 +43,7 @@ type BinaryForwardingProxy struct {
 
 func (b BinaryForwardingProxy) Close() {
 	b.deviceConn.Close()
+	b.decoder.close()
 }
 
 func (b BinaryForwardingProxy) Send(msg []byte) error {
@@ -71,13 +74,13 @@ func handleConnectToService(connectRequest ios.UsbMuxMessage,
 
 	serviceConfig := getServiceConfigForName(serviceInfo.ServiceName)
 	binToDevice := BinaryForwardingProxy{muxToDevice.ReleaseDeviceConnection(), serviceConfig.codec(
-		path.Join(p.info.ConnectionPath, "from-device.json"),
-		path.Join(p.info.ConnectionPath, "from-device.bin"),
+		path.Join(p.info.ConnectionPath, serviceInfo.ServiceName+"-from-device.json"),
+		path.Join(p.info.ConnectionPath, serviceInfo.ServiceName+"-from-device.bin"),
 		p.log,
 	)}
 	binOnUnixSocket := BinaryForwardingProxy{muxOnUnixSocket.ReleaseDeviceConnection(), serviceConfig.codec(
-		path.Join(p.info.ConnectionPath, "to-device.json"),
-		path.Join(p.info.ConnectionPath, "to-device.bin"),
+		path.Join(p.info.ConnectionPath, serviceInfo.ServiceName+"-to-device.json"),
+		path.Join(p.info.ConnectionPath, serviceInfo.ServiceName+"-to-device.bin"),
 		p.log,
 	)}
 

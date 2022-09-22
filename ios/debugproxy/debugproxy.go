@@ -208,7 +208,7 @@ func writeJSON(filePath string, JSON interface{}) {
 	if err != nil {
 		panic(fmt.Sprintf("Could not write to file err: %v filepath:'%s'", err, filePath))
 	}
-	jsonmsg, err := json.Marshal(JSON)
+	jsonmsg, err := json.MarshalIndent(JSON, "", "  ")
 	if err != nil {
 		log.Warnf("Error encoding '%s' to json: %s", JSON, err)
 	}
